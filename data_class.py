@@ -88,7 +88,7 @@ class data:
         
     def traitement(self):
         self.Nw = len(self.x)
-        self.Ntfd = self.Nw*3
+        self.Ntfd = self.Nw*3 #puissance de deux supérieure
         self.Y = fft(self.y, self.Ntfd)
         self.X = fft(self.x, self.Ntfd)
         self.freq = np.arange(self.Ntfd)*(self.Fs/self.Ntfd)
@@ -97,6 +97,35 @@ class data:
         self.h= np.real(ifft(self.H))
         self.h /= np.max(self.h[:int(self.Fs)])
         self.t_h = np.arange(self.Ntfd)/self.Fs
+        
+        
+        self.H2 = np.abs(self.H[1:self.Ntfd//2])
+        # print("test1")
+        # for i in range(len(self.H2)):
+        #     #print(i)
+        #     print(len(self.H2)-i)
+        #     a = round(i*2**(-1/(2*24)))
+        #     b = round(i*2**(1/(2*24)))
+        #     try:
+        #         self.H2[i] = sum(self.H2[a:b])/len(self.H2[a:b])
+        #     except:
+        #         pass
+            
+        # print("test2")
+        
+        print("test1")
+        for i in range(len(self.H2)):
+            
+            try:
+                self.H2[i] = sum(self.H2[i-20:i+20])/len(self.H2[i-20:i+20])
+                
+            except:
+                pass
+            
+        print("test2")
+        
+        
+        
         
         Rxy = 1/self.Ntfd*fftshift(np.real(ifft(self.Y*np.conj(self.X))))
         Rxx = 1/self.Ntfd*fftshift(np.real(ifft(np.abs(self.X)**2)))
@@ -113,14 +142,9 @@ class data:
         #test (attention à la RI)
         self.H = self.oppo*self.H*np.exp(-1j*2*self.freq*self.delay*1e-3)
         
-        print(self.Fs)
-        print(self.Ntfd)
-        print(self.Fs/self.Ntfd)
+        
         
     def data_plot(self):
-        N_avg = 365
-        h_avg = np.ones(N_avg)/N_avg
-        H_avg = lfilter(h_avg, [1.],np.abs(self.H))
         
         
         
@@ -131,7 +155,8 @@ class data:
         #ax11.semilogx(self.freq, self.coherence, color="b")
 
         self.axes[1].semilogx(self.freq[1:self.Ntfd//2:10], 20*np.log(np.abs(self.H[1:self.Ntfd//2:10])), label=self.name)
-        self.axes[1].semilogx(self.freq[1:self.Ntfd//2:10], 20*np.log(H_avg[1:self.Ntfd//2:10]), label=self.name)
+        self.axes[1].semilogx(self.freq[1:self.Ntfd//2:10], 20*np.log(self.H2[1:self.Ntfd//2:10]), label=self.name)
+
         
         self.axes[1].set_xlim(self.f_min, self.f_max)
         self.axes[1].legend()

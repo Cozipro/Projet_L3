@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from data_class import data
 import sounddevice as sd
 
+plt.rc_context(
+        {'axes.edgecolor': 'white', 'xtick.color': 'white', 'ytick.color': 'white', 'figure.facecolor': 'white'})
 figure = plt.subplots(3)
 lst_mesure = []
 
@@ -68,21 +70,27 @@ device_out_wd.grid(row=1,column=1)
 
 
 def trace():
+    figure[0].set_facecolor('k')
+
+    
     for axe in figure[1]:
         axe.clear()
-        axe.grid(True)
+        axe.grid(True, alpha = 0.25)
 
     figure[1][1].set_xlim(10, 20000)
-    figure[1][2].set_xlim(10, 20000)
-    figure[1][1].set_title("module")
-    figure[1][2].set_title("phase")
+    figure[1][2].set_xlim(10, 20000) #a enlever ?
+    figure[1][1].set_title("MODULE", color="white")
+    figure[1][2].set_title("PHASE", color="white")
     plt.tight_layout()
             
     for truc in lst_mesure:
         truc.data_plot()
     
     for axe in figure[1]:
+        axe.set_facecolor('k')
         axe.legend()
+        axe.spines['right'].set_visible(False)
+        axe.spines['top'].set_visible(False)
     
     fig = plt.gcf()
     fig.show()

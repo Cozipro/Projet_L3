@@ -15,10 +15,10 @@ close all
 % Données 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cd ../data
+
 load('BLANC_1.lvm') % A REMPLACER PAR LE LOAD DU SPECTRE
 t=BLANC_1(:,1);     % ....
-cd ../prog
+
 fe=1/(t(2)-t(1));   % A SUPPRIMER
 N=length(t);        % A SUPPRIMER
 f=[0:N-1]/N*fe;     % A REMPLACER PAR LE LOAD DU VECTEUR F
@@ -30,7 +30,7 @@ x=x-mean(x);        % A SUPPRIMER
 % Analyse frequentielle par Bandes 
 %
 %           on ne normalise pas le spectre
-%           on calcule un niveau par bande 
+%           on calcule un niveau par bande c
 %           pour le calcul du niveau global, on divise la valeur efficace par N 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
