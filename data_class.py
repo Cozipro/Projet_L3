@@ -145,6 +145,12 @@ class data:
         
         
     def data_plot(self):
+<<<<<<< Updated upstream
+=======
+        N_avg = 150
+        h_avg = np.ones(N_avg)/N_avg
+        H_avg = lfilter(h_avg, [1.],np.abs(self.H))
+>>>>>>> Stashed changes
         
         
         
