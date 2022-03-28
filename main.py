@@ -7,7 +7,7 @@ import sounddevice as sd
 
 plt.rc_context(
         {'axes.edgecolor': 'white', 'xtick.color': 'white', 'ytick.color': 'white', 'figure.facecolor': 'white'})
-figure = plt.subplots(3)
+figure = plt.subplots(3, sharex= True)
 lst_mesure = []
 
 
@@ -38,7 +38,7 @@ tkinter.Label(m, text="Ch mesure").grid(row=2)
 tkinter.Label(m, text="Ch référence").grid(row=3)
 tkinter.Label(m, text='Freq min').grid(row=4)
 tkinter.Label(m, text='Freq max').grid(row=5)
-tkinter.Label(m, text='Temps').grid(row=6)
+tkinter.Label(m, text='Δf / N_avg').grid(row=6)
 tkinter.Label(m, text="Nom").grid(row=0, column=2)
 
 
@@ -47,6 +47,7 @@ ch_ref = tkinter.Entry(m)
 f_min_wd = tkinter.Entry(m)
 f_max_wd = tkinter.Entry(m)
 temps = tkinter.Entry(m)
+n_average_entry = tkinter.Entry(m)
 name_wdg = tkinter.Entry(m)
 
 ch_mesure.grid(row=2, column=1)
@@ -54,13 +55,15 @@ ch_ref.grid(row=3, column=1)
 f_min_wd.grid(row=4, column=1)
 f_max_wd.grid(row=5, column=1)
 temps.grid(row=6, column=1)
+n_average_entry.grid(row=6, column=2)
 name_wdg.grid(row=0, column=3)
 
 ch_mesure.insert(0,"0")
 ch_ref.insert(0,"1")
 f_min_wd.insert(0,"20")
 f_max_wd.insert(0,"20000")
-temps.insert(0,"2")
+temps.insert(0,"1")
+n_average_entry.insert(0,"1")
 
 device_in_wd = ttk.Combobox(m, values=lst_devices_in)
 device_in_wd.grid(row=0,column=1)
@@ -79,8 +82,9 @@ def trace():
 
     figure[1][1].set_xlim(10, 20000)
     figure[1][2].set_xlim(10, 20000) #a enlever ?
-    figure[1][1].set_title("MODULE", color="white")
-    figure[1][2].set_title("PHASE", color="white")
+    figure[1][0].set_title("MODULE", color="white")
+    figure[1][1].set_title("PHASE", color="white")
+    figure[1][2].set_title("COHERENCE", color="white")
     plt.tight_layout()
             
     for truc in lst_mesure:
@@ -104,6 +108,7 @@ def f():
     f_max_value = float(f_max_wd.get())
     temps_value = float(temps.get())
     name_value = str(name_wdg.get())
+    n_average = int(n_average_entry.get())
     Fs_value = 44100
     
     interface_in = device_in_wd.get()
@@ -114,10 +119,10 @@ def f():
     lst_mesure.append(data(figure=figure, Fs=Fs_value, f_min=f_min_value, f_max=f_max_value, temps=temps_value, 
                            ch_mesure=ch_mesure_val, ch_ref=ch_ref_val, 
                            signal_type="chirp", 
-                           name=name_value))
+                           name=name_value, N_average= n_average))
     
 
-    lst_test.append(tkinter.Entry(m))
+    
     for index, truc in enumerate(lst_test):
         truc.grid(row=index, column=5)
     
