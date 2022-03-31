@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from data_class import data
 import sounddevice as sd
 
+from data_saving import data_saving
+
 plt.rc_context(
         {'axes.edgecolor': 'white', 'xtick.color': 'white', 'ytick.color': 'white', 'figure.facecolor': 'white'})
 figure = plt.subplots(3, sharex= True)
@@ -15,11 +17,12 @@ lst_devices_in = []
 lst_devices_out = []
 lst_devices = []
 
-lst_test = []
+lst_save = []
 
-
+#Liste contenant toutes les cartes son
 devices = sd.query_devices()
 
+#Triage des cartes pour les input/output
 for device in devices:
     
     if device.get("max_input_channels") == 0:
@@ -29,9 +32,10 @@ for device in devices:
     lst_devices.append(device.get("name"))
     
 
-m = tkinter.Tk()
-m.title("Logiciel de mesure acoustique")
+m = tkinter.Tk() #creation de la fenetre
+m.title("Logiciel de mesure acoustique") #titre de la fenetre
 
+#création des labels
 tkinter.Label(m, text="Interface IN").grid(row=0)
 tkinter.Label(m, text="Interface OUT").grid(row=1)
 tkinter.Label(m, text="Ch mesure").grid(row=2)
@@ -64,6 +68,7 @@ f_min_wd.insert(0,"20")
 f_max_wd.insert(0,"20000")
 temps.insert(0,"1")
 n_average_entry.insert(0,"1")
+name_wdg.insert(0,"Mesure")
 
 device_in_wd = ttk.Combobox(m, values=lst_devices_in)
 device_in_wd.grid(row=0,column=1)
@@ -80,15 +85,13 @@ def trace():
         axe.clear()
         axe.grid(True, alpha = 0.25)
 
-    figure[1][1].set_xlim(10, 20000)
-    figure[1][2].set_xlim(10, 20000) #a enlever ?
     figure[1][0].set_title("MODULE", color="white")
     figure[1][1].set_title("PHASE", color="white")
     figure[1][2].set_title("COHERENCE", color="white")
     plt.tight_layout()
             
-    for truc in lst_mesure:
-        truc.data_plot()
+    for data_object in lst_mesure:
+        data_object.data_plot()
     
     for axe in figure[1]:
         axe.set_facecolor('k')
@@ -101,7 +104,7 @@ def trace():
         
     
 
-def f():
+def mesure():
     ch_mesure_val = float(ch_mesure.get())
     ch_ref_val = float(ch_ref.get())
     f_min_value = float(f_min_wd.get())
@@ -122,9 +125,10 @@ def f():
                            name=name_value, N_average= n_average))
     
 
-    
-    for index, truc in enumerate(lst_test):
-        truc.grid(row=index, column=5)
+    #lst_save.append(tkinter.Button(m,text="Sauvegarder"))
+    for index, truc in enumerate(lst_save):
+        truc.grid(row=index, column=6)
+        
     
     
     trace()
@@ -132,14 +136,20 @@ def f():
 def clear():
     for i in lst_mesure[::-1]:
         lst_mesure.remove(i)
+    
+    
+    for i in lst_save[::-1]:
+        i.destroy()
+        lst_save.remove(i)
+        
     trace()
     
-    for i in lst_test[::-1]:
-        i.destroy()
-        lst_test.remove(i)
-    
+def save():
+    # for data_object in lst_mesure:
+    #     data_object.save_txt()
+    data_saving(lst_mesure)
 
-B = tkinter.Button(m, text ="Mesure", command = f)
+B = tkinter.Button(m, text ="Mesure", command = mesure)
 B.grid(row=7, column=0)
 
 B_clear = tkinter.Button(m, text="Effacer", command = clear)
@@ -147,6 +157,9 @@ B_clear.grid(row=7, column = 1)
 
 B_quit = tkinter.Button(m, text="Quit", command =m.quit)
 B_quit.grid(row=7, column=2)
+
+B_save = tkinter.Button(m, text="Sauvegarder", command = save)
+B_save.grid(row=7, column=3)
 
 
 

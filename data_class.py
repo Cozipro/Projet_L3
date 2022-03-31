@@ -24,14 +24,12 @@ class data:
             signal=np.zeros(int((2+self.temps)*Fs))
             signal[Fs:int((1+self.temps)*Fs)] = chirp(time, self.f_min, self.temps, self.f_max, method='logarithmic', phi=90)
             
-        elif signal_type == "white_noise":
-            signal=np.zeros(int((self.temps+2)*self.Fs))
-            
-            signal[Fs:int((1+self.temps)*Fs)] = np.random.randn(int(self.N)) # white gaussian noise
-            signal /= np.max(signal)
+        n_min = int(1*Fs-0.2)
+        n_max = int((1+self.temps+0.2)*Fs)
         
-        self.x_mtr = np.zeros((len(signal),N_average))
-        self.y_mtr = np.zeros((len(signal),N_average))
+        self.x_mtr = np.zeros((n_max-n_min,N_average))
+        self.y_mtr = np.zeros((n_max-n_min,N_average))
+        
         
         
         #plt.figure()
@@ -55,61 +53,30 @@ class data:
     
             y = np.roll(y, -abs(l[N_max]))
             x = np.roll(x, -abs(l[N_max]))
-            print(-abs(l[N_max]))
             
-            self.x_mtr[:,i] = x
-            self.y_mtr[:,i] = y
-            
-            #plt.plot(np.arange(len(x))/self.Fs, x)
+            self.x_mtr[:,i] = x[n_min:n_max]
+            self.y_mtr[:,i] = y[n_min:n_max]
         
         
-        x = np.mean(self.x_mtr, 1)
-        y = np.mean(self.y_mtr, 1)
+        self.x = np.mean(self.x_mtr, 1)
+        self.y = np.mean(self.y_mtr, 1)
+           
         
-        
-        
-        #plt.show()
-        
-        """
-        t = np.arange(len(x))/Fs
-        fig, ax = plt.subplots(2)
-        for i in range(N_average):
-            ax[0].plot(t, x_mtr[:,i], label="{}".format(i))
-            
-            ax[1].plot(t, y_mtr[:,i], label="{}".format(i))
-            
-        ax[0].plot(t, x, label = "moyenne")
-        ax[1].plot(t, y, label = "moyenne")
-        for axe in ax:
-            axe.grid(True)
-            axe.legend()
-        plt.show()"""
-        
-        if signal_type == "chirp":
-            Wr = np.zeros(len(x))
-            
-            n_min = int(1*Fs-0.2)
-            n_max = int((1+self.temps+0.2)*Fs)
-            Wr[n_min:n_max]=1
-            W = Wr
-            
-        elif signal_type == "white_noise":
-            n_min = int(1*Fs-0.2)
-            n_max = int((1+self.temps+0.2)*Fs)
-            
-            win = np.zeros(len(signal))
-            
-            N_win = n_max-n_min
-            win[n_min: n_max] = windows.hann(N_win,sym = True)
-            
-            W = win
-    
-        self.x = x*W
-        self.y = y*W
+        #self.x = x
+        #self.y = y
         
         self.traitement()
         
     def traitement(self):
+        """
+        Calcule la fonction de transfert et la fonction de cohérence.
+
+        Returns
+        -------
+        None.
+
+        """
+        
         self.Nw = len(self.x)
         self.Ntfd = self.Nw #à faire:puissance de deux supérieure
         Ntfd_c = 2*len(self.x)-1 #pour les correlations
@@ -120,78 +87,45 @@ class data:
         self.H = self.Y/self.X
         
         
-    
-        self.H2 = np.abs(self.H[1:self.Ntfd//2])
-        # On va appliquer le filtre sur des fenêtres de la taille du signal/Ncut
-        Ncut = 24
-        Nwin = int(self.H2.size/Ncut)
-        # Il nous faut un Nwin impair
-        Nwin = Nwin if Nwin % 2 else Nwin + 1
-        # On filtre data à l'ordre N=4 (on peut baisser l'ordre pour lisser plus)
-        self.H2= savgol_filter(self.H2, Nwin, 3)
-        
-        """
-        N_oct = 24
-        
-        f = self.freq[1:self.Ntfd//2]
-        X = np.abs(self.H[1:self.Ntfd//2])
-        X_oct = np.zeros(len(X))
-        for i in range(len(f)):
-            sigma = (f[i]/N_oct)/np.pi                      # standard deviation
-            g = np.exp(-(((f-f[i])**2)/(2*(sigma**2))))
-            g = g/np.sum(g)
-
-            X_oct[i] = np.sum(g*X)
-        self.H3 = X_oct
-        """
-        
-        
-        
         Sxx_mtr = np.zeros((Ntfd_c,self.N_average), dtype=complex)
         Syy_mtr = np.zeros((Ntfd_c,self.N_average), dtype=complex)
         Sxy_mtr = np.zeros((Ntfd_c,self.N_average), dtype=complex)
         
         
-        
-        #plt.figure()
-        
         for i in range(self.N_average):
             x = self.x_mtr[:,i]
             y = self.y_mtr[:,i]
             
-            Sxx = fft(ifftshift(correlate(x,x)))
-            Syy = fft(ifftshift(correlate(y,y)))
-            Sxy = fft(ifftshift(correlate(x,y)))
+            Sxx = fft(ifftshift(correlate(x,x)),Ntfd_c)
+            Syy = fft(ifftshift(correlate(y,y)),Ntfd_c)
+            Sxy = fft(ifftshift(correlate(x,y)),Ntfd_c)
             
             Sxx_mtr[:,i]= Sxx
             Syy_mtr[:,i]= Syy
             Sxy_mtr[:,i]= Sxy
-            
-
         
-        self.freq2 = np.arange(Ntfd_c)*(self.Fs/Ntfd_c)
-        
-
-    
         
         Sxx = np.mean(Sxx_mtr, 1)
         Syy = np.mean(Syy_mtr, 1)
         Sxy = np.mean(Sxy_mtr, 1)
         
-        
-        
-        self.coherence2 = np.abs(Sxy)**2/(Sxx*Syy)
-        
-        
-        
+        self.coherence = np.round((np.abs(Sxy)**2/(Sxx*Syy)),3)
+        self.freq2 = np.arange(Ntfd_c)*(self.Fs/Ntfd_c)
         
         
     def data_plot(self):
+        """
+        Plot le module / phase et cohérence
+        Set les limites des plots
+
+        Returns
+        -------
+        None.
+
+        """
         
 
         self.axes[0].plot(self.freq[1:self.Ntfd//2:10], 20*np.log(np.abs(self.H[1:self.Ntfd//2:10])), label=self.name)
-        self.axes[0].plot(self.freq[1:self.Ntfd//2:10], 20*np.log(np.abs(self.H2[1:self.Ntfd//2:10])), label=self.name)
-        #self.axes[1].semilogx(self.freq[1:self.Ntfd//2:10], 20*np.log(np.abs(self.H3[1:self.Ntfd//2:10])), label=self.name)
         
         self.axes[0].set_xlim(self.f_min, self.f_max)
         self.axes[0].legend()
@@ -199,11 +133,38 @@ class data:
         self.axes[1].plot(self.freq[1:self.Ntfd//2:10], np.rad2deg(np.angle(self.H[1:self.Ntfd//2:10])), label=self.name)
         self.axes[1].set_xlim(self.f_min, self.f_max)
         
-        self.axes[2].plot(self.freq2, self.coherence2, color="r")
+        self.axes[2].plot(self.freq2, self.coherence, label=self.name)
+        self.axes[2].set_ylim(None,1.1)
         
         
         
         
+    def save_txt(self):
+        """
+        Enregistre un fichier .txt contennant les paramètres de l'acquisition, 
+        ainsi qu'un fichier contenant la mesure
+        
+
+        Returns
+        -------
+        None.
+
+        """
+        temp = np.zeros((len(self.freq[1:self.Ntfd//2]),3))
+        temp[:,0] = self.freq[1:self.Ntfd//2]
+        temp[:,1]=np.abs(self.H[1:self.Ntfd//2])
+        temp[:,2] = np.angle(self.H[1:self.Ntfd//2])
+        np.savetxt("{}_MOD_PHASE.txt".format(self.name), temp, header="Freq / Module de H / Phase de H")
+        
+        
+        temp = np.zeros((len(self.freq2),2))
+        temp[:,0] = self.freq2
+        temp[:,0] = self.coherence
+        
+        np.savetxt("{}_COHERENCE.txt".format(self.name), temp, header="Freq / COHERENCE")
+
+    def get_data(self):
+        return self.freq, self.freq2, np.abs(self.H), np.angle(self.H), self.coherence
         
         
         
