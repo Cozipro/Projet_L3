@@ -157,11 +157,14 @@ class data:
         np.savetxt("{}_MOD_PHASE.txt".format(self.name), temp, header="Freq / Module de H / Phase de H")
         
         
-        temp = np.zeros((len(self.freq[1:self.Ntfd//2]),2))
-        temp[:,0] = self.freq[1:self.Ntfd//2]
-        temp[:,0] = self.coherence[1:self.Ntfd//2]
+        temp = np.zeros((len(self.freq2),2))
+        temp[:,0] = self.freq2
+        temp[:,0] = self.coherence
+        
         np.savetxt("{}_COHERENCE.txt".format(self.name), temp, header="Freq / COHERENCE")
 
+    def get_data(self):
+        return self.freq, self.freq2, np.abs(self.H), np.angle(self.H), self.coherence
         
         
         

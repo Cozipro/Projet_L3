@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from data_class import data
 import sounddevice as sd
 
+from data_saving import data_saving
+
 plt.rc_context(
         {'axes.edgecolor': 'white', 'xtick.color': 'white', 'ytick.color': 'white', 'figure.facecolor': 'white'})
 figure = plt.subplots(3, sharex= True)
@@ -66,6 +68,7 @@ f_min_wd.insert(0,"20")
 f_max_wd.insert(0,"20000")
 temps.insert(0,"1")
 n_average_entry.insert(0,"1")
+name_wdg.insert(0,"Mesure")
 
 device_in_wd = ttk.Combobox(m, values=lst_devices_in)
 device_in_wd.grid(row=0,column=1)
@@ -142,8 +145,9 @@ def clear():
     trace()
     
 def save():
-    for data_object in lst_mesure:
-        data_object.save_txt()
+    # for data_object in lst_mesure:
+    #     data_object.save_txt()
+    data_saving(lst_mesure)
 
 B = tkinter.Button(m, text ="Mesure", command = mesure)
 B.grid(row=7, column=0)

@@ -33,13 +33,13 @@ def data_saving(lst):
         temp[:,0] = freq
         temp[:,1]= H_abs
         temp[:,2] = H_angle
-        np.savetxt("{}_MOD_PHASE.txt".format(path), temp, header="Freq / Module de H / Phase de H")
+        np.savetxt("{}/MOD_PHASE.txt".format(path), temp, header="Freq / Module de H / Phase de H")
         
-        
+        print(freq2.dtype)
         temp = np.zeros((len(freq2),2))
         temp[:,0] = freq2
-        temp[:,0] = coherence
-        np.savetxt("{}_COHERENCE.txt".format(path), temp, header="Freq / COHERENCE")
+        temp[:,1] = np.abs(coherence)
+        np.savetxt("{}/COHERENCE.txt".format(path), temp, header="Freq / COHERENCE")
 
         
 if __name__ == '__main__':    
