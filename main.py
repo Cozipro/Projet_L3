@@ -7,10 +7,9 @@ import sounddevice as sd
 
 from data_saving import data_saving
 
-plt.rc_context(
-        {'axes.edgecolor': 'white', 'xtick.color': 'white', 'ytick.color': 'white', 'figure.facecolor': 'white'})
+plt.rc_context(rc={'axes.edgecolor': 'white', 'xtick.color': 'white', 'ytick.color': 'white', 'figure.facecolor': 'white'})
 figure = plt.subplots(3, sharex= True)
-figure[0].set_facecolor('k')
+
 
 lst_mesure = [] #liste contenant les objets data_class
 
@@ -51,7 +50,7 @@ ch_mesure = tkinter.Entry(m)
 ch_ref = tkinter.Entry(m)
 f_min_wd = tkinter.Entry(m)
 f_max_wd = tkinter.Entry(m)
-temps = tkinter.Entry(m)
+delta_F = tkinter.Entry(m)
 n_average_entry = tkinter.Entry(m)
 name_wdg = tkinter.Entry(m)
 
@@ -60,7 +59,7 @@ ch_mesure.grid(row=2, column=1)
 ch_ref.grid(row=3, column=1)
 f_min_wd.grid(row=4, column=1)
 f_max_wd.grid(row=5, column=1)
-temps.grid(row=6, column=1)
+delta_F.grid(row=6, column=1)
 n_average_entry.grid(row=6, column=2)
 name_wdg.grid(row=0, column=3)
 
@@ -69,7 +68,7 @@ ch_mesure.insert(0,"0")
 ch_ref.insert(0,"1")
 f_min_wd.insert(0,"20")
 f_max_wd.insert(0,"20000")
-temps.insert(0,"1")
+delta_F.insert(0,"1")
 n_average_entry.insert(0,"1")
 name_wdg.insert(0,"Mesure")
 
@@ -82,10 +81,11 @@ device_out_wd.grid(row=1,column=1)
 
 
 def trace(): 
+    figure[0].set_facecolor('k')
     #On efface les subplots
     for axe in figure[1]:
         axe.clear()
-        
+        axe.grid(True, alpha = 0.25)
 
     figure[1][0].set_title("MODULE", color="white")
     figure[1][1].set_title("PHASE", color="white")
@@ -100,7 +100,6 @@ def trace():
         axe.legend()
         axe.spines['right'].set_visible(False)
         axe.spines['top'].set_visible(False)
-        axe.grid(True, alpha = 0.25)
     
     #fig = plt.gcf() #je sais pas ce que c'est, je sais même pas si c'est utile
     
@@ -115,7 +114,7 @@ def mesure():
     ch_ref_val = float(ch_ref.get())
     f_min_value = float(f_min_wd.get())
     f_max_value = float(f_max_wd.get())
-    temps_value = float(temps.get())
+    delta_F_value = float(delta_F.get())
     name_value = str(name_wdg.get())
     n_average = int(n_average_entry.get())
     Fs_value = 44100
@@ -128,7 +127,7 @@ def mesure():
     
     #création d'un objet data_class
     lst_mesure.append(data(figure=figure, Fs=Fs_value, f_min=f_min_value, 
-                           f_max=f_max_value, temps=temps_value, 
+                           f_max=f_max_value, delta_F=delta_F_value, 
                            ch_mesure=ch_mesure_val, ch_ref=ch_ref_val, 
                            signal_type="chirp", 
                            name=name_value, N_average= n_average))
