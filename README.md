@@ -40,6 +40,6 @@ Ce bouton permet de sauvegarder en 3 fichiers chaque mesure dans un dossier pers
 
 Contrairement aux figures qui n'affichent que les fréquences comprisent entre [Freq min : Freq max], le fichier <ins>MOD_PHASE.txt:</ins> enregistre les fréquences entre [0 : Fs]
 
-  
-
 ## Bouton Quitter
+
+Ce bouton permet de quitter le logiciel
