@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import shutil
+from scipy.io import wavfile
 
 def data_saving(lst):
     """
@@ -35,11 +36,20 @@ def data_saving(lst):
         temp[:,2] = H_angle
         np.savetxt("{}/MOD_PHASE.txt".format(path), temp, header="Freq / Module de H / Phase de H")
         
-        print(freq2.dtype)
         temp = np.zeros((len(freq2),2))
         temp[:,0] = freq2
         temp[:,1] = np.abs(coherence)
         np.savetxt("{}/COHERENCE.txt".format(path), temp, header="Freq / COHERENCE")
+        
+        x, y, Fs = data_object.get_temporal_data()
+        
+        
+        temp = np.empty((len(x),2))
+        temp[:,0]=x
+        temp[:,1]=y
+        wavfile.write("{}/{}.wav".format(path,data_name), Fs, temp)
+
+
 
         
 if __name__ == '__main__':    
