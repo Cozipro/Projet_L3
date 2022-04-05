@@ -43,3 +43,15 @@ Contrairement aux figures qui n'affichent que les fréquences comprisent entre [
 ## Bouton Quitter
 
 Ce bouton permet de quitter le logiciel
+
+
+# Exemple de courbes
+
+<img src="https://github.com/Cozipro/Projet_L3/blob/main/images/courbes.png"  width="800" height="450" />
+
+
+
+
+
+# Remerciements
+Un très grand merci à Guilhem Pages.
