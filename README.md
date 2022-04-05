@@ -2,7 +2,9 @@
 Ce logiciel résulte du projet du 6e semestre de la licence Acoustique et Vibration de l'Université du Mans. 
 Il doit être éxécuté avec une version de python 3.7.X.
 
-Ce logiciel a pour objectif de déterminer la fonction de transfert (H) d'un filtre se représentant sous la forme:
+Ce logiciel est toujours en cours de développement, il est fonctionnel mais comporte certainement des erreurs.
+
+Ce logiciel a pour objectif de déterminer la fonction de transfert H d'un filtre se représentant sous la forme:
 
 <img src="https://github.com/Cozipro/Projet_L3/blob/main/images/filtre.PNG"  width="500" height="100" />
 
