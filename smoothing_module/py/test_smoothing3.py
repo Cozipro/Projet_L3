@@ -1,7 +1,4 @@
-import sys
 
-sys.path.insert(0, "D:/Desktop/Université/projets_personnels/smaartV12/test_smoothing/smoothing_module/py")
-sys.path.append("c:/Users/coren/AppData/Local/Programs/Python/Python37/DLLs")
 
 import smoothing as sm
 import matplotlib.pyplot as plt
