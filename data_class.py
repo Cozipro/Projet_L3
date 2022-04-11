@@ -92,6 +92,8 @@ class data:
         self.x = np.mean(self.x_mtr, 1)
         self.y = np.mean(self.y_mtr, 1)
         
+
+        
     def traitement(self):
         
         self.Nw = len(self.x)
@@ -151,6 +153,7 @@ class data:
         self.axes[1].set_xlim(self.f_min, self.f_max)
         
         self.axes[2].plot(self.freq2, self.coherence, label=self.name)
+        self.axes[2].set_xlim(self.f_min, self.f_max)
         self.axes[2].set_ylim(None,1.1)
         
         

@@ -40,11 +40,10 @@ def data_saving(lst):
         
         x, y, Fs = data_object.get_temporal_data()
         
+        maxi = max(max(x), max(y))
+        temp = np.concatenate((x/maxi, y/maxi)).reshape(2, len(x)).T
         
-        temp = np.concatenate((x, y)).reshape(2, len(x)).T
-        print(x)
-        print(y)
-        wavfile.write("{}/{}.wav".format(path,data_name), Fs, temp.astype("int16"))
+        wavfile.write("{}/{}.wav".format(path,data_name), Fs, temp)
 
 
 
