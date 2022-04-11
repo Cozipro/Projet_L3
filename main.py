@@ -715,7 +715,7 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.label_generalinfo.setText(_translate("MainWindow", "General Informations"))
-        self.label_measurmentdef.setText(_translate("MainWindow", "Graphic parametres"))
+        self.label_measurmentdef.setText(_translate("MainWindow", "Graphic Parameters"))
         self.label_aquisition.setText(_translate("MainWindow", "Aquisition"))
         self.checkBox_2.setText(_translate("MainWindow", "Vertical axes : dB "))
         self.checkBox_3.setText(_translate("MainWindow", "Horizontal axes : LogX"))
@@ -727,7 +727,7 @@ class Ui_MainWindow(object):
         self.lineEdit.setText(_translate("MainWindow", "50"))
         for i in range(len(self.lst_devices_in)):
             (self.comboBox_4.setItemText(i, _translate("MainWindow",self.lst_devices_in[i])))
-        self.comboBox.setItemText(0, _translate("MainWindow", "Chrip"))
+        self.comboBox.setItemText(0, _translate("MainWindow", "Chirp"))
         self.comboBox.setItemText(1, _translate("MainWindow", "White Noise"))
         self.label.setText(_translate("MainWindow", "Number of average"))
         self.label_samplerate.setText(_translate("MainWindow", "Sample Rate (Hz)"))
