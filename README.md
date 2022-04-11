@@ -24,18 +24,18 @@ L'interface se présente de la façon suivante (version non-définitive):
 - <ins>N_avg:</ins> Nombre de moyennes
 - <ins>Nom:</ins> Nom de la mesure
 
-## Bouton Mesure
+## Bouton Measure
 
 Ce bouton lance la série de mesures. Un nombre N_avg de chirp vont être joués tous séparés de 2 secondes. L'algorithme enregistre les deux cannaux en même temps dont chaque enregistrement va être stocké avant d'être moyenné pour obtenir les signaux x et y finaux.
 L'algorithme va pouvoir ensuite calculer la fonction de transfert et la fonction de cohérence.
 
 <ins>A noter :</ins> Si une seule moyenne est réalisée, la fonction de cohérence sera égale à 1 pour toute fréquence. Il est nécessaire de réaliser au moins 2 moyennes pour que la fonction de cohérence ait un sens.
 
-## Bouton Effacer
+## Bouton Clear
 
 Ce bouton permet d'effacer les courbes.
 
-## Bouton Sauvegarder
+## Bouton Save
 
 Ce bouton permet de sauvegarder en 3 fichiers chaque mesure dans un dossier personnel dont le nom correspond au nom de la mesure donnée par l'utilisateur:
 
@@ -44,7 +44,9 @@ Ce bouton permet de sauvegarder en 3 fichiers chaque mesure dans un dossier pers
 
 Contrairement aux figures qui n'affichent que les fréquences comprisent entre [Freq min : Freq max], le fichier <ins>MOD_PHASE.txt:</ins> enregistre les fréquences entre [0 : Fs]
 
-## Bouton Quitter
+Un fichier .wav stéréo est également enregistré, le signal de gauche étant le signal de référence, et le signal de droite le signal mesuré.
+
+## Bouton Exit
 
 Ce bouton permet de quitter le logiciel
 
