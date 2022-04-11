@@ -18,6 +18,7 @@ L'interface se présente de la façon suivante (version non-définitive):
 - <ins>Interface OUT:</ins> Liste pour choisir l'interface audio de sortie
 - <ins>Ch mesure:</ins> Numéro de l'entrée correspondant au signal y
 - <ins>Ch référence:</ins> Numéro de l'entrée correspondant au signal x (signal de référence)
+- <ins>Sample Rate:</ins> Fréquence d'échantillonnage (Widget pas encore implémenté, doit être changé directement dans le code.
 - <ins>Freq min / Freq max:</ins> Fréquence de départ et de fin du chirp
 - <ins>ΔF:</ins> Pas fréquentiel
 - <ins>N_avg:</ins> Nombre de moyennes
