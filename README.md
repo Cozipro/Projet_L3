@@ -11,7 +11,8 @@ Ce logiciel a pour objectif de déterminer la fonction de transfert H d'un filtr
 # Interface utilisateur
 
 L'interface se présente de la façon suivante (version non-définitive):
-![interface](images/interface.PNG)
+
+<img src="https://github.com/Cozipro/Projet_L3/blob/main/images/interface2.PNG"  width="600" height="460" />
 
 - <ins>Interface IN:</ins> Liste pour choisir l'interface audio d'entrée
 - <ins>Interface OUT:</ins> Liste pour choisir l'interface audio de sortie
