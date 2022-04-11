@@ -15,6 +15,8 @@ class data:
         self.temps = 1/delta_F
         self.name = name
         self.N_average = N_average
+        self.ch_ref = ch_ref
+        self.ch_mesure = ch_mesure
         
         self.N = self.temps*self.Fs
         
@@ -24,24 +26,52 @@ class data:
             signal=np.zeros(int((2+self.temps)*Fs))
             signal[Fs:int((1+self.temps)*Fs)] = chirp(time, self.f_min, self.temps, self.f_max, method='logarithmic', phi=90)
             
-        n_min = int(1*Fs-0.2)
-        n_max = int((1+self.temps+0.2)*Fs)
+            self.record(signal)
+            self.traitement()
+            
+        if signal_type == "white_noise":
+            signal=np.zeros(int((2+self.temps)*Fs))
+            print(int(self.temps*Fs))
+            print(self.temps*Fs)
+            signal[Fs:int((1+self.temps)*Fs)] = np.random.randn(int(self.temps*Fs))
+            
+            self.record(signal)
+            self.traitement_welch()
         
-        self.x_mtr = np.zeros((n_max-n_min,N_average))
-        self.y_mtr = np.zeros((n_max-n_min,N_average))
         
         
-        for i in range(N_average):
+    def record(self,signal):
+        """
+        
+
+        Parameters
+        ----------
+        signal : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        """
+        n_min = int(1*self.Fs-0.2)
+        n_max = int((1+self.temps+0.2)*self.Fs)
+        
+        self.x_mtr = np.zeros((n_max-n_min, self.N_average))
+        self.y_mtr = np.zeros((n_max-n_min, self.N_average))
+        
+        
+        for i in range(self.N_average):
             #On lit le sigal et on enregistre les signaux d'entrée
             data = sd.playrec(signal, self.Fs, channels=2, blocking=True)
             
-            x = data[:,int(ch_ref)]
-            y = data[:,int(ch_mesure)]
+            x = data[:,int(self.ch_ref)]
+            y = data[:,int(self.ch_mesure)]
             
             
             #normalisation
-            y = data[:,0]/2**15
-            x = data[:,1]/2**15
+            y = data[:,0]/2**23
+            x = data[:,1]/2**23
             
             
             #corrélation pour enlever latence
@@ -62,18 +92,13 @@ class data:
         self.x = np.mean(self.x_mtr, 1)
         self.y = np.mean(self.y_mtr, 1)
         
-        self.traitement()
-        
-    def record(self):
-        pass
-        
     def traitement(self):
         
         self.Nw = len(self.x)
-        self.Ntfd = int(self.temps*self.Fs) #à faire:puissance de deux supérieure
+        self.Ntfd = int(self.temps*self.Fs)
         Ntfd_c = 2*len(self.x)-1 #pour les correlations
-        self.Y = fft(self.y, self.Ntfd)
-        self.X = fft(self.x, self.Ntfd)
+        self.Y = fft(self.y, self.Ntfd)/self.Fs
+        self.X = fft(self.x, self.Ntfd)/self.Fs
         self.freq = np.arange(self.Ntfd)*(self.Fs/self.Ntfd)
 
         self.H = self.Y/self.X
@@ -118,11 +143,11 @@ class data:
         """
         
 
-        self.axes[0].plot(self.freq[1:self.Ntfd//2:10], 20*np.log(np.abs(self.H[1:self.Ntfd//2:10])), label=self.name)
+        self.axes[0].plot(self.freq[1:self.Ntfd//2], 10*np.log(np.abs(self.H[1:self.Ntfd//2])), label=self.name)
         
         self.axes[0].set_xlim(self.f_min, self.f_max)
 
-        self.axes[1].plot(self.freq[1:self.Ntfd//2:10], np.rad2deg(np.angle(self.H[1:self.Ntfd//2:10])), label=self.name)
+        self.axes[1].plot(self.freq[1:self.Ntfd//2], np.rad2deg(np.angle(self.H[1:self.Ntfd//2])), label=self.name)
         self.axes[1].set_xlim(self.f_min, self.f_max)
         
         self.axes[2].plot(self.freq2, self.coherence, label=self.name)
@@ -152,12 +177,13 @@ class data:
 
             freq, Sxx_mtr[i] = welch(x, fs = self.Fs, window = w, Nfft = 512) #à changer c'est du bricolage ça
             Syy_mtr[i] = welch(y, fs = self.Fs, window = w, Nfft = 512)[1]
-            Sxy_mtr[i] = csd(x, fs = self.Fs, window = w, Nfft = 512)[1]
+            Sxy_mtr[i] = csd(x, y, fs = self.Fs, window = w, Nfft = 512)[1]
         
         
         Sxx = np.mean(Sxx_mtr, 1)
         Syy = np.mean(Syy_mtr, 1)
         Sxy = np.mean(Sxy_mtr, 1)
+        
         
         self.H = Sxy/Sxx
         
