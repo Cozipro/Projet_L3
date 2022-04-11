@@ -30,23 +30,19 @@ def data_saving(lst):
         
         freq, freq2, H_abs, H_angle, coherence = data_object.get_data()
         
-        temp = np.zeros((len(freq),3))
-        temp[:,0] = freq
-        temp[:,1]= H_abs
-        temp[:,2] = H_angle
+    
+        temp = np.concatenate((freq, H_abs, H_angle)).reshape(3, len(freq)).T
         np.savetxt("{}/MOD_PHASE.txt".format(path), temp, header="Freq / Module de H / Phase de H")
         
-        temp = np.zeros((len(freq2),2))
-        temp[:,0] = freq2
-        temp[:,1] = np.abs(coherence)
+        
+        temp = np.concatenate((freq2, np.abs(coherence))).reshape(2, len(freq2)).T
         np.savetxt("{}/COHERENCE.txt".format(path), temp, header="Freq / COHERENCE")
         
         x, y, Fs = data_object.get_temporal_data()
         
+        maxi = max(max(x), max(y))
+        temp = np.concatenate((x/maxi, y/maxi)).reshape(2, len(x)).T
         
-        temp = np.empty((len(x),2))
-        temp[:,0]=x
-        temp[:,1]=y
         wavfile.write("{}/{}.wav".format(path,data_name), Fs, temp)
 
 
