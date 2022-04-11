@@ -23,6 +23,8 @@ L'interface se présente de la façon suivante (version non-définitive):
 - <ins>ΔF:</ins> Pas fréquentiel
 - <ins>N_avg:</ins> Nombre de moyennes
 - <ins>Nom:</ins> Nom de la mesure
+- <ins>Horizontal Axes: logX:</ins> Change l'échelle horizontale des courbes entre linéaire ou logarithmique
+- <ins>Vertival Axes: dB:</ins> Change l'échelle verticale des courbes entre linéaire ou logarithmique
 
 ## Bouton Measure
 
@@ -40,7 +42,7 @@ Ce bouton permet d'effacer les courbes.
 Ce bouton permet de sauvegarder en 3 fichiers chaque mesure dans un dossier personnel dont le nom correspond au nom de la mesure donnée par l'utilisateur:
 
 - <ins>MOD_PHASE.txt:</ins> construit de la manière suivante : Axe fréquentiel, Module de H, Phase de H
-- <ins>COHERENCE.txt:</ins> construit de la manière suivante : Axe fréqentiel, fonction de coherence
+- <ins>COHERENCE.txt:</ins> construit de la manière suivante : Axe fréquentiel, fonction de coherence
 
 Contrairement aux figures qui n'affichent que les fréquences comprisent entre [Freq min : Freq max], le fichier <ins>MOD_PHASE.txt:</ins> enregistre les fréquences entre [0 : Fs]
 
