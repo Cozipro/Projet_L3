@@ -216,7 +216,7 @@ def FFT(function, Fs, duration = 1):
 
 
 
-def chirp(Fmin, Fmax, i, duration = 1):
+def chirp(Fs, Fmin, Fmax, duration = 1, method='logarithmic', phase=90):
     """
         Fmin = minimal frequency of the signal (Hz)
         Fmin = maximal frequency of the signal (Hz)
@@ -224,7 +224,7 @@ def chirp(Fmin, Fmax, i, duration = 1):
     """
 
     time = np.arange(0, duration, 1 / Fs)
-    function = signal.chirp(time + i , f0=Fmin, f1=Fmax, t1=duration,  method='logarithmic', phi=90)
+    function = signal.chirp(time, f0=Fmin, f1=Fmax, t1=duration,  method= method, phi=phase)
 
     return time, function
 

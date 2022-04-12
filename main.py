@@ -867,7 +867,7 @@ class Ui_MainWindow(object):
         self.lst_mesure.append(data(figure=self.figure, Fs=self.Fs_value, f_min=self.f_min_value, 
                                f_max=self.f_max_value, delta_F=self.delta_F_value, 
                                ch_mesure=self.ch_mesure_val, ch_ref=self.ch_ref_val, 
-                               signal_type="chirp", 
+                               signal_type="white_noise", 
                                name=self.name_value, N_average= n_average))
         
         

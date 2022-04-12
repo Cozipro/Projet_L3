@@ -1,8 +1,8 @@
 import numpy as np
-from scipy.signal import chirp, correlate, welch, csd, hann
+from scipy.signal import correlate, welch, csd, hann
 import sounddevice as sd
 from scipy.fftpack import fft, ifftshift
-
+from signals_generator import chirp, white_noise
 
 
 class data:
@@ -24,16 +24,15 @@ class data:
             time = np.arange(self.N)/self.Fs #axe temporel pour la création du chirp
             
             signal=np.zeros(int((2+self.temps)*Fs))
-            signal[Fs:int((1+self.temps)*Fs)] = chirp(time, self.f_min, self.temps, self.f_max, method='logarithmic', phi=90)
+            signal[Fs:int((1+self.temps)*Fs)] = chirp(self.Fs, self.f_min, self.f_max, self.temps, "logarithmic", 90)[1]
             
             self.record(signal)
             self.traitement()
             
         if signal_type == "white_noise":
             signal=np.zeros(int((2+self.temps)*Fs))
-            print(int(self.temps*Fs))
-            print(self.temps*Fs)
             signal[Fs:int((1+self.temps)*Fs)] = np.random.randn(int(self.temps*Fs))
+            #signal[Fs:int((1+self.temps)*Fs)] = white_noise(int(self.temps*self.Fs))[1]
             
             self.record(signal)
             self.traitement_welch()
@@ -168,19 +167,22 @@ class data:
     def traitement_welch(self):
         Nw = 512
         w = hann(Nw)
+        self.Ntfd = 512
         
         Sxx_mtr = np.zeros((Nw//2+1,self.N_average), dtype=complex)
         Syy_mtr = np.zeros((Nw//2+1,self.N_average), dtype=complex)
         Sxy_mtr = np.zeros((Nw//2+1,self.N_average), dtype=complex)
+        
+        print(Sxx_mtr.shape)
         
         for i in range(self.N_average):
             x = self.x_mtr[:,i]
             y = self.y_mtr[:,i]
             
 
-            freq, Sxx_mtr[i] = welch(x, fs = self.Fs, window = w, Nfft = 512) #à changer c'est du bricolage ça
-            Syy_mtr[i] = welch(y, fs = self.Fs, window = w, Nfft = 512)[1]
-            Sxy_mtr[i] = csd(x, y, fs = self.Fs, window = w, Nfft = 512)[1]
+            self.freq, Sxx_mtr[:,i] = welch(x, fs = self.Fs, window = w, nfft = 512) #à changer c'est du bricolage ça
+            Syy_mtr[:,i] = welch(y, fs = self.Fs, window = w, nfft = 512)[1]
+            Sxy_mtr[:,i] = csd(x, y, fs = self.Fs, window = w, nfft = 512)[1]
         
         
         Sxx = np.mean(Sxx_mtr, 1)
@@ -190,6 +192,7 @@ class data:
         
         self.H = Sxy/Sxx
         
+        self.freq2 = self.freq
         self.coherence = np.abs(Sxy)**2/(Sxx*Syy)
         
         
