@@ -8,6 +8,13 @@ Ce logiciel a pour objectif de déterminer la fonction de transfert H d'un filtr
 
 <img src="https://github.com/Cozipro/Projet_L3/blob/main/images/filtre.PNG"  width="500" height="100" />
 
+# Dépendences
+- <ins>Numpy:</ins>
+- <ins>Matplotlib:</ins>
+- <ins>Sounddevice:</ins>
+- <ins>Scipy:</ins>
+- <ins>PyQt:</ins>
+
 # Interface utilisateur
 
 L'interface se présente de la façon suivante (version non-définitive):
