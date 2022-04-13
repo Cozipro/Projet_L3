@@ -70,5 +70,6 @@ Ce bouton permet de quitter le logiciel
 
 # Remerciements
 - Un très grand merci à Guilhem Pages.
+- Un grand merci à Arthur Guillet.
 - Un grand merci à Mathis Delgado pour le module de smoothing.
 - Un grand merci à M. Ayrault.
