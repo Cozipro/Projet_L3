@@ -45,8 +45,6 @@ def data_saving(lst):
         
         wavfile.write("{}/{}.wav".format(path,data_name), Fs, temp)
 
-
-
-        
+    
 if __name__ == '__main__':    
     data_saving(None)

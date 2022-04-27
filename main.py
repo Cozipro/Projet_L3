@@ -5,6 +5,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QToolTip, QPushButton, QMessageBox)
 import webbrowser
+from data_saving import data_saving
 
 
 def clicked():
@@ -705,6 +706,8 @@ class Ui_MainWindow(object):
         self.pushButton_3.clicked.connect(self.show)
         self.pushButton_2.clicked.connect(self.clear)
         
+        self.pushButton.clicked.connect(self.save) #bouton save
+        
         self.checkBox_2.stateChanged.connect(self.trace)
         self.checkBox_3.stateChanged.connect(self.trace)
         
@@ -745,7 +748,7 @@ class Ui_MainWindow(object):
         self.label_aquisitionFrequencyParameters.setText(_translate("MainWindow", "Aquisition Frequency Parameters"))
         self.pushButton_startthemesure.setText(_translate("MainWindow", "Start the measure"))
         self.label_measurmentlabel.setText(_translate("MainWindow", "Measurement Label"))
-        self.lineEditmeasurmentlabel.setText(_translate("MainWindow", "Measurement "))
+        self.lineEditmeasurmentlabel.setText(_translate("MainWindow", "Measurement"))
         self.label_author.setText(_translate("MainWindow", "Author"))
         self.label_date.setText(_translate("MainWindow", "Date"))
         self.lineEdit_author.setText(_translate("MainWindow", "You"))
@@ -851,6 +854,7 @@ class Ui_MainWindow(object):
         # self.date=self.lineEdit_date.text()
 
         n_average = int(self.lineEdit_7.text())
+        signal_type = self.comboBox.currentText()
         self.ch_mesure_val = float(self.lineEdit_5.text())
         self.ch_ref_val = float(self.lineEdit_6.text())
         self.f_min_value = float(self.lineEdit.text())
@@ -864,10 +868,11 @@ class Ui_MainWindow(object):
         sd.default.device = [self.lst_devices.index(self.interface_in),self.lst_devices.index(self.interface_out)]   
 
         
+        
         self.lst_mesure.append(data(figure=self.figure, Fs=self.Fs_value, f_min=self.f_min_value, 
                                f_max=self.f_max_value, delta_F=self.delta_F_value, 
                                ch_mesure=self.ch_mesure_val, ch_ref=self.ch_ref_val, 
-                               signal_type="chirp", 
+                               signal_type=signal_type.lower(), 
                                name=self.name_value, N_average= n_average))
         
         
@@ -881,6 +886,9 @@ class Ui_MainWindow(object):
             self.lst_mesure.remove(i)
     
         self.trace()
+        
+    def save(self):
+        data_saving(self.lst_mesure)
 
 
 if __name__ == "__main__":
