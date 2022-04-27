@@ -29,7 +29,7 @@ class data:
             self.record(signal)
             self.traitement()
             
-        if signal_type == "white_noise":
+        if signal_type == "white noise":
             signal=np.zeros(int((2+self.temps)*Fs))
             signal[Fs:int((1+self.temps)*Fs)] = np.random.randn(int(self.temps*Fs))
             #signal[Fs:int((1+self.temps)*Fs)] = white_noise(int(self.temps*self.Fs))[1]
@@ -144,7 +144,7 @@ class data:
         """
         
 
-        self.axes[0].plot(self.freq[1:self.Ntfd//2], 10*np.log(np.abs(self.H[1:self.Ntfd//2])), label=self.name)
+        self.axes[0].plot(self.freq[1:self.Ntfd//2], np.abs(self.H[1:self.Ntfd//2]), label=self.name)
         
         self.axes[0].set_xlim(self.f_min, self.f_max)
 
@@ -167,22 +167,21 @@ class data:
     def traitement_welch(self):
         Nw = 512
         w = hann(Nw)
-        self.Ntfd = 512
+        self.Ntfd = int(self.temps*self.Fs) #a verifier
         
-        Sxx_mtr = np.zeros((Nw//2+1,self.N_average), dtype=complex)
-        Syy_mtr = np.zeros((Nw//2+1,self.N_average), dtype=complex)
-        Sxy_mtr = np.zeros((Nw//2+1,self.N_average), dtype=complex)
+        Sxx_mtr = np.zeros((self.Ntfd//2+1,self.N_average), dtype=complex)
+        Syy_mtr = np.zeros((self.Ntfd//2+1,self.N_average), dtype=complex)
+        Sxy_mtr = np.zeros((self.Ntfd//2+1,self.N_average), dtype=complex)
         
-        print(Sxx_mtr.shape)
         
         for i in range(self.N_average):
             x = self.x_mtr[:,i]
             y = self.y_mtr[:,i]
             
 
-            self.freq, Sxx_mtr[:,i] = welch(x, fs = self.Fs, window = w, nfft = 512) #à changer c'est du bricolage ça
-            Syy_mtr[:,i] = welch(y, fs = self.Fs, window = w, nfft = 512)[1]
-            Sxy_mtr[:,i] = csd(x, y, fs = self.Fs, window = w, nfft = 512)[1]
+            self.freq, Sxx_mtr[:,i] = welch(x, fs = self.Fs, window = w, nfft = self.Ntfd) #à changer c'est du bricolage ça
+            Syy_mtr[:,i] = welch(y, fs = self.Fs, window = w, nfft = self.Ntfd)[1]
+            Sxy_mtr[:,i] = csd(x, y, fs = self.Fs, window = w, nfft = self.Ntfd)[1]
         
         
         Sxx = np.mean(Sxx_mtr, 1)
