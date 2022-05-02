@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (
     QApplication, QWidget, QToolTip, QPushButton, QMessageBox)
 import webbrowser
 from data_saving import data_saving
+import data_plot
 
 
 def clicked():
@@ -14,7 +15,10 @@ def clicked():
 class Ui_MainWindow(object):
     def __init__ (self):
         plt.rc_context(rc={'axes.edgecolor': 'white', 'xtick.color': 'white', 'ytick.color': 'white', 'figure.facecolor': 'white'})
-        self.figure = plt.subplots(3)
+        
+        self.figure_FRF = plt.subplots(3)
+        # self.figure_PS = plt.subplots(1)
+        
         self.lst_mesure = []
         self.lst_devices_in = []
         self.lst_devices_out = []
@@ -757,50 +761,14 @@ class Ui_MainWindow(object):
         self.pushButton.setText(_translate("MainWindow", "Save the measure"))
         self.pushButton_3.setToolTip(_translate("MainWindow", "<html><head/><body><pre style=\" margin-top:0px; margin-bottom:10px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:142.857%; background-color:#ffffff;\"><span style=\" font-family:\'Menlo,Monaco,Consolas,Courier New,monospace\'; font-size:13px; color:#000000; background-color:#ffffff;\">QObject::</span><span style=\" font-family:\'Menlo,Monaco,Consolas,Courier New,monospace\'; font-size:13px; color:#000088; background-color:#ffffff;\">connect</span><span style=\" font-family:\'Menlo,Monaco,Consolas,Courier New,monospace\'; font-size:13px; color:#000000; background-color:#ffffff;\">(closeBtn, SIGNAL(clicked()), qApp, SLOT(quit()));</span></pre></body></html>"))
         self.pushButton_3.setText(_translate("MainWindow", "Exit"))
-##########################################################################
-#################     START THE MEASURE BUTTON     #######################
-##########################################################################
-    def pressed(self, MainWindow):
-             self.numberofaverage = self.lineEdit_7.text()
-             self.minfreq = self.lineEdit.text()
-             self.maxfreq=self.lineEdit_2.text()
-             self.delta_F=self.lineEdit_3.text()
-             self.samplerate=self.lineEdit_4.text()
-             self.chmes=self.lineEdit_5.text()
-             self.chref=self.lineEdit_6.text()
-             self.nomdlamesure=self.lineEditmeasurmentlabel.text()
-             self.author=self.lineEdit_author.text()
-             self.date=self.lineEdit_date.text()
-             self.comboboxIN = self.comboBox_4.currentText()
-             self.comboboxOUT = self.comboBox_2.currentText()
-             # self.numberofaverage = self.lineEdit_7.text()
-             # self.minfreq = self.lineEdit.text()
-             # self.maxfreq=self.lineEdit_2.text()
-             # self.delta_F=self.lineEdit_3.text()
-             # self.samplerate=self.lineEdit_4.text()
-             # self.chmes=self.lineEdit_5.text()
-             # self.chref=self.lineEdit_6.text()
-             # self.nomdlamesure=self.lineEditmeasurmentlabel.text()
-             # self.author=self.lineEdit_author.text()
-             # self.date=self.lineEdit_date.text()
-             # self.comboboxIN = self.comboBox_4.currentText()
-             # self.comboboxOUT = self.comboBox_2.currentText()
-             # print(self.numberofaverage) 
-             # print(self.minfreq)
-             # print(self.maxfreq)
-             # print(self.delta_F) 
-             # print(self.samplerate)
-             # print(self.chmes)
-             # print(self.chref)
-             # print(self.comboboxIN)
-             # print(self.comboboxOUT)
-             # print(self.nomdlamesure)
-             # print(self.author)
-             # print(self.date)
+
 ##########################################################################
 ########################     MESSAGE BOX     #############################
 ##########################################################################
     def show(self):
+        """
+        Message à la fermeture
+        """
         msg=QMessageBox()
         msg.setWindowTitle("WARNING")
         msg.setText("WARNING ! ARE YOU SURE ?")
@@ -815,21 +783,23 @@ class Ui_MainWindow(object):
    
     def trace(self):
             
-        self.figure[0].set_facecolor('k')
+        self.figure_FRF[0].set_facecolor('k')
         #On efface les subplots
-        for axe in self.figure[1]:
+        for axe in self.figure_FRF[1]:
             axe.clear()
             
 
-        self.figure[1][0].set_title("MODULE", color="white")
-        self.figure[1][1].set_title("PHASE", color="white")
-        self.figure[1][2].set_title("COHERENCE", color="white")
+        self.figure_FRF[1][0].set_title("MODULE", color="white")
+        self.figure_FRF[1][1].set_title("PHASE", color="white")
+        self.figure_FRF[1][2].set_title("COHERENCE", color="white")
         plt.tight_layout()
                 
         for data_object in self.lst_mesure:
             data_object.data_plot()
+        #data_plot.data_plot_FRF(self.figure_FRF, self.lst_mesure, 
+        #                        self.f_min_value, self.f_max_value)
         
-        for axe in self.figure[1]:
+        for axe in self.figure_FRF[1]:
             axe.set_facecolor('k')
             axe.legend()
             axe.spines['right'].set_visible(False)
@@ -842,12 +812,19 @@ class Ui_MainWindow(object):
             else:
                 axe.set_xscale("linear")
         if self.checkBox_2.isChecked():
-            self.figure[1][0].set_yscale("log")
+            self.figure_FRF[1][0].set_yscale("log")
         else:
-            self.figure[1][0].set_yscale("linear")
+            self.figure_FRF[1][0].set_yscale("linear")
+        
         
         plt.show()
-
+        
+        
+        #Figure Power Spectrum
+        # data_plot.data_plot_Power_Spectrum(self.figure_PS, self.lst_mesure, self.f_min_value, self.f_max_value)
+        
+        # plt.show()
+        
     def mesure(self, MainWindow):
         # self.samplerate=self.lineEdit_4.text()
         # self.author=self.lineEdit_author.text()
@@ -865,11 +842,19 @@ class Ui_MainWindow(object):
         self.interface_in = self.comboBox_4.currentText()
         self.interface_out = self.comboBox_2.currentText()
     
-        sd.default.device = [self.lst_devices.index(self.interface_in),self.lst_devices.index(self.interface_out)]   
+        sd.default.device = [self.lst_devices.index(self.interface_in),
+                             self.lst_devices.index(self.interface_out)]   
 
+        # asio_out = sd.AsioSettings(channel_selectors=[0,1])
+        # asio_in = sd.AsioSettings(channel_selectors=[0,1])
+        # sd.default.extra_settings = asio_in, asio_out
+        # sd.default.channels = 2,2
+        # # self.nbIn = len([0,1])+1
+        # # self.nbOut = len([0,1])+1
+        # # self.lbIn = self.ch_ref_val
+        # # self.lbOut = 1
         
-        
-        self.lst_mesure.append(data(figure=self.figure, Fs=self.Fs_value, f_min=self.f_min_value, 
+        self.lst_mesure.append(data(figure=self.figure_FRF, Fs=self.Fs_value, f_min=self.f_min_value, 
                                f_max=self.f_max_value, delta_F=self.delta_F_value, 
                                ch_mesure=self.ch_mesure_val, ch_ref=self.ch_ref_val, 
                                signal_type=signal_type.lower(), 

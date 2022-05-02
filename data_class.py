@@ -18,9 +18,11 @@ class data:
         self.ch_ref = ch_ref
         self.ch_mesure = ch_mesure
         
-        self.N = self.temps*self.Fs
+        
+        
         
         if signal_type == "chirp":
+            self.N = int(self.temps*self.Fs)
             time = np.arange(self.N)/self.Fs #axe temporel pour la création du chirp
             
             signal=np.zeros(int((2+self.temps)*Fs))
@@ -30,14 +32,23 @@ class data:
             self.traitement()
             
         if signal_type == "white noise":
-            signal=np.zeros(int((2+self.temps)*Fs))
-            signal[Fs:int((1+self.temps)*Fs)] = np.random.randn(int(self.temps*Fs))
-            #signal[Fs:int((1+self.temps)*Fs)] = white_noise(int(self.temps*self.Fs))[1]
+            self.Nw = int(self.Fs/delta_F)
+            self.N = int((self.N_average-1)*self.Nw/2 + self.Nw)
             
-            self.record(signal)
+            # signal=np.zeros(int((2+self.temps)*Fs))
+            # #signal[Fs:int((1+self.temps)*Fs)] = np.random.randn(int(self.temps*Fs))
+            # signal[Fs:int((1+self.temps)*Fs)] = white_noise(int(self.N))[1]
+            
+            signal = white_noise(int(self.N))[1]
+            
+            self.record_noise(signal)
             self.traitement_welch()
         
+    def record_noise(self, signal):
+        data = sd.playrec(signal, self.Fs, channels=2, blocking=True)
         
+        self.x = data[:,int(self.ch_ref)]
+        self.y = data[:,int(self.ch_mesure)]
         
     def record(self,signal):
         """
@@ -53,12 +64,13 @@ class data:
         None.
 
         """
+        
         n_min = int(1*self.Fs-0.2)
         n_max = int((1+self.temps+0.2)*self.Fs)
         
         self.x_mtr = np.zeros((n_max-n_min, self.N_average))
         self.y_mtr = np.zeros((n_max-n_min, self.N_average))
-        
+        delta_N = []
         
         for i in range(self.N_average):
             #On lit le sigal et on enregistre les signaux d'entrée
@@ -74,23 +86,35 @@ class data:
             
             
             #corrélation pour enlever latence
-            Rxy = correlate(signal, x)
+            Rsx = correlate(signal, x)
             l = np.arange(-len(signal)+1, len(signal))
-            N_max = np.argmax(Rxy)
+            N_max = np.argmax(Rsx)
             #t = l[N_max]/Fs #décalage en secondes
-    
+            
+            
             #Décalage des signaux pour que leur début soit le même pour tous
             y = np.roll(y, -abs(l[N_max]))
             x = np.roll(x, -abs(l[N_max]))
             
+            # Rxy = correlate(x,y)
+            # l2 = np.arange(-len(x)+1, len(x))
+            # N_max2 = np.argmax(Rxy) #nombre de points de décalage entre sortie et entrée
+            
+            # y = np.roll(y, -abs(l[N_max2]))
+            
+            
             #on stock la mesure pour la traiter plus tard
             self.x_mtr[:,i] = x[n_min:n_max]
             self.y_mtr[:,i] = y[n_min:n_max]
+            
+            # print("delta_N"+N_max2)
+            # delta_N.append(N_max2)
         
         #Moyenne temporelle de tous les signaux
         self.x = np.mean(self.x_mtr, 1)
         self.y = np.mean(self.y_mtr, 1)
         
+        # self.delta_N = np.mean(delta_N)
 
         
     def traitement(self):
@@ -157,42 +181,38 @@ class data:
         
         
 
-    def get_data(self):
+    def get_data_FRF(self):
         return self.freq, self.freq2, np.abs(self.H), np.angle(self.H), self.coherence
+    
+    def get_frequency_data(self):
+        "pour avoir le spectre fréquentiel de chaque signal"
+        
+        try:
+            return self.freq, self.X, self.Y
+        except AttributeError:
+            return self.freq2, self.Sxx, self. Syy
     
     def get_temporal_data(self):
         return self.x, self.y, self.Fs
         
         
     def traitement_welch(self):
-        Nw = 512
-        w = hann(Nw)
-        self.Ntfd = int(self.temps*self.Fs) #a verifier
-        
-        Sxx_mtr = np.zeros((self.Ntfd//2+1,self.N_average), dtype=complex)
-        Syy_mtr = np.zeros((self.Ntfd//2+1,self.N_average), dtype=complex)
-        Sxy_mtr = np.zeros((self.Ntfd//2+1,self.N_average), dtype=complex)
-        
-        
-        for i in range(self.N_average):
-            x = self.x_mtr[:,i]
-            y = self.y_mtr[:,i]
-            
+        w = hann(self.Nw)
+        self.Ntfd = self.Nw #a verifier
+          
 
-            self.freq, Sxx_mtr[:,i] = welch(x, fs = self.Fs, window = w, nfft = self.Ntfd) #à changer c'est du bricolage ça
-            Syy_mtr[:,i] = welch(y, fs = self.Fs, window = w, nfft = self.Ntfd)[1]
-            Sxy_mtr[:,i] = csd(x, y, fs = self.Fs, window = w, nfft = self.Ntfd)[1]
+        self.freq, self.Sxx = welch(self.x, fs = self.Fs, window = w, nfft = self.Ntfd) #à changer c'est du bricolage ça
+        self.Syy = welch(self.y, fs = self.Fs, window = w, nfft = self.Ntfd)[1]
+        self.Sxy = csd(self.x, self.y, fs = self.Fs, window = w, nfft = self.Ntfd)[1]
         
         
-        Sxx = np.mean(Sxx_mtr, 1)
-        Syy = np.mean(Syy_mtr, 1)
-        Sxy = np.mean(Sxy_mtr, 1)
         
         
-        self.H = Sxy/Sxx
+        self.H = (self.Sxy/self.Sxx)
         
+        #pourquoi j'ai fais ça ???
         self.freq2 = self.freq
-        self.coherence = np.abs(Sxy)**2/(Sxx*Syy)
+        self.coherence = np.abs(self.Sxy)**2/(self.Sxx*self.Syy)
         
         
         
