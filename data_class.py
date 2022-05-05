@@ -210,7 +210,7 @@ class data:
         
         self.H = (self.Sxy/self.Sxx)
         
-        #pourquoi j'ai fais ça ???
+        #pourquoi j'ai fais ça ??? ah oui c logique
         self.freq2 = self.freq
         self.coherence = np.abs(self.Sxy)**2/(self.Sxx*self.Syy)
         
