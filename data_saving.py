@@ -28,7 +28,7 @@ def data_saving(lst):
             shutil.rmtree(path)
             os.mkdir(path)
         
-        freq, freq2, H_abs, H_angle, coherence = data_object.get_data()
+        freq, freq2, H_abs, H_angle, coherence = data_object.get_data_FRF()
         
     
         temp = np.concatenate((freq, H_abs, H_angle)).reshape(3, len(freq)).T
